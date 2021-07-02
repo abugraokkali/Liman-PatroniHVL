@@ -5,48 +5,51 @@ use Liman\Toolkit\Shell\Command;
 class PatroniController
 {
 	function init(){
-		//sudo ./gopatroniyml reinit --etcd 192.168.1.67 --scope postgreskume (parola random)
 		$etcd = extensionDb('etcdAdress');
 		$scope = extensionDb('scopeName');
-
-		$init = "bash -c 'DEBIAN_FRONTEND=noninteractive /tmp/gopatroniyml init --etcd " . $etcd . " > /tmp/outputOfGoPatroni 2>&1'";
-		$initScope = "bash -c 'DEBIAN_FRONTEND=noninteractive /tmp/gopatroniyml init --etcd " . $etcd . " --scope " . $scope . " > /tmp/outputOfGoPatroni 2>&1'";
+		$patroniName = extensionDb('patroniName');
+        $patroniIp = $this->getIP();
+        
+		$init = "/etc/gopatroniyml init --etcd ". $etcd ." -i " . $patroniIp ." -n ". $patroniName ." --path /tmp/patroni.yml";
+		$initScope = "/etc/gopatroniyml init --etcd ". $etcd ." -i ". $patroniIp ." -n ". $patroniName ." -s ". $scope ." --path /tmp/patroni.yml";
 		
 		if($scope != ""){
-			runCommand(sudo() . $initScope);
+			shell_exec($initScope." > /tmp/errorLog");
+
 		}else{
-			runCommand(sudo() . $init);
+			shell_exec($init." > /tmp/errorLog");
 		}
 		
-		$output = "cat /tmp/outputOfGoPatroni";
-		$output = runCommand(sudo() . $output);
-
-		if(strpos($output, 'If you want to reinitialize patroni.yml file') !== false) {
-			return respond("There is already a patroni.yml file. Note that this action will overwrite patroni.yml file and reset it to its first initalized state !",201);
-        }
-		else{
-			return respond("Successfully initalized.",200);
-		}
+		$remote_path = '/tmp/patroni.yml';
+		putFile('/tmp/patroni.yml', $remote_path);
+		runCommand(sudo().'mv /tmp/patroni.yml /etc/');
+        $this->restart();
+        return respond("Successfully initalized.",200);
+		
 	}
 
 	function reinit(){
 		$etcd = extensionDb('etcdAdress');
 		$scope = extensionDb('scopeName');
+		$patroniName = extensionDb('patroniName');
+        $patroniIp = $this->getIP();
 
-		$reinit = "bash -c 'DEBIAN_FRONTEND=noninteractive /tmp/gopatroniyml reinit --etcd " . $etcd . " > /tmp/outputOfGoPatroni 2>&1'";
-		$reinitScope = "bash -c 'DEBIAN_FRONTEND=noninteractive /tmp/gopatroniyml reinit --etcd " . $etcd . " --scope " . $scope . " > /tmp/outputOfGoPatroni 2>&1'";
-
+		$init = "/tmp/gopatroniyml reinit --etcd ". $etcd ." -i " . $patroniIp ." -n ". $patroniName ." --path /tmp/patroni.yml";
+		$initScope = "/tmp/gopatroniyml reinit --etcd ". $etcd ." -i ". $patroniIp ." -n ". $patroniName ." -s ". $scope ." --path /tmp/patroni.yml";
+		
 		if($scope != ""){
-			$output = runCommand(sudo() . $reinitScope);
+			shell_exec($initScope." 2>&1 /tmp/errorLog");
 		}else{
-			$output = runCommand(sudo() . $reinit);
+			shell_exec($init." 2>&1 /tmp/errorLog");
 		}
-
-		$this->activate();
-
-		return respond("Successfully reinitalized.",200);
+        $this->restart();
+        return respond("Successfully reinitalized.",200);
 	}
 
+	function restart(){
+        runCommand(sudo() . "systemctl restart patroni.service");
+    }
+    
 	function add(){
 		validate([
 			'ip' => 'required|string',
@@ -59,7 +62,23 @@ class PatroniController
 		return respond("New node successfully added.",200);
 	}
 
-	function activate(){
-        runCommand(sudo() . "systemctl restart patroni.service");
+    function isYmlExists(){
+        $command = 'test -e /etc/patroni.yml && echo 1 || echo 0';
+        $flag = runCommand(sudo() . $command);
+
+        if($flag){
+            return respond(true,200);
+        }
+        else{
+            return respond(false,201);
+        }
+
     }
+
+    function getIP(){
+        $command = "hostname -I | awk '{print $1}'";
+        $ip = runCommand(sudo().$command);
+        return $ip;
+    }
+
 }

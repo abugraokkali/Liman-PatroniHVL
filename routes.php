@@ -5,4 +5,7 @@ return [
 
     "get_hostname" => "HostnameController@get",
     "set_hostname" => "HostnameController@set",
+
+    "is_yml_exists" => "PatroniController@isYmlExists",
+    "init" => "PatroniController@init"
 ];
