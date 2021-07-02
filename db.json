@@ -3,7 +3,27 @@
     "publisher": "Administrator",
     "version": "0.0.1",
     "version_code": 2,
-    "database": [],
+    "database": [
+        {
+            "variable": "etcdAdress",
+            "type": "text",
+            "name": "Ip of Etcd Server",
+            "required": true
+        },
+        {
+            "variable": "patroniName",
+            "type": "text",
+            "name": "Patroni Name",
+            "required": true
+        },
+        {
+            "variable": "scopeName",
+            "type": "text",
+            "name": "Scope Name (optional)",
+            "required": false
+        }
+        
+    ],
     "widgets": [],
     "language": "php",
     "status": 0,
