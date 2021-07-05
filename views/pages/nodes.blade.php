@@ -16,10 +16,8 @@
 @endcomponent
 
 <button class="btn btn-success" onclick="showAddNodeModal()" style="float:left;">Add New Node</button>
-<button class="btn btn-danger" onclick="init()" style="float:left;margin-left:10px;">Reinitalize</button>
 <br />
 <br />
-
 <div class="table-responsive hbaTable" id="hbaTable"></div>
 
 
@@ -44,15 +42,15 @@
     function hbaTable(){
         var form = new FormData();
         request(API('hba'), form, function(response) {
-            $('.hbaTable').html(response).find('table').DataTable({
-            bFilter: true,
-            "language" : {
-                url : "/turkce.json"
-            }
-            });;
+            $('.hbaTable').html(response).find('table').DataTable(dataTablePresets('normal'));
+            
         }, function(response) {
             let error = JSON.parse(response);
             showSwal(error.message,'error',2000);
         });
     }
+
+    
+
+    
 </script>
