@@ -5,19 +5,33 @@ use Liman\Toolkit\Shell\Command;
 class PatroniController
 {
 	function init(){
-		$etcd = extensionDb('etcdAdress');
-		$scope = extensionDb('scopeName');
-		$patroniName = extensionDb('patroniName');
-        $patroniIp = $this->getIP();
-        
-		$init = "/etc/gopatroniyml init --etcd ". $etcd ." -i " . $patroniIp ." -n ". $patroniName ." --path /tmp/patroni.yml";
-		$initScope = "/etc/gopatroniyml init --etcd ". $etcd ." -i ". $patroniIp ." -n ". $patroniName ." -s ". $scope ." --path /tmp/patroni.yml";
+
+		validate([
+			'patroniIpAdress' => 'required|string',
+			'etcdIpAdress' => 'required|string',
+			'patroniName' => 'required|string',
+			'patroniPassword' => 'required|string'
+
+		]);
+
+		$patroniIp = request("patroniIpAdress");
+        $etcd = request("etcdIpAdress");
+        $patroniName = request("patroniName");
+        $password = request("patroniPassword");
+        $scope = request("scopeName");
+
+		$init = "/etc/gopatroniyml init --etcd ". $etcd ." -i " . $patroniIp ." -n ". $patroniName ." --password ". $password ." --path /tmp/patroni.yml";
+		$initScope = "/etc/gopatroniyml init --etcd ". $etcd ." -i ". $patroniIp ." -n ". $patroniName ." --password ". $password." -s ". $scope ." --path /tmp/patroni.yml";
 		
 		if($scope != ""){
-			shell_exec($initScope." > /tmp/errorLog");
+			shell_exec($initScope." > /tmp/output.txt");
+			shell_exec("echo ".$initScope." > /tmp/commandLog.txt");
 
 		}else{
-			shell_exec($init." > /tmp/errorLog");
+			shell_exec($init." > /tmp/output.txt");
+			shell_exec("echo ".$init." > /tmp/commandLog.txt");
+
+
 		}
 		
 		$remote_path = '/tmp/patroni.yml';
@@ -29,21 +43,44 @@ class PatroniController
 	}
 
 	function reinit(){
-		$etcd = extensionDb('etcdAdress');
-		$scope = extensionDb('scopeName');
-		$patroniName = extensionDb('patroniName');
-        $patroniIp = $this->getIP();
 
-		$init = "/tmp/gopatroniyml reinit --etcd ". $etcd ." -i " . $patroniIp ." -n ". $patroniName ." --path /tmp/patroni.yml";
-		$initScope = "/tmp/gopatroniyml reinit --etcd ". $etcd ." -i ". $patroniIp ." -n ". $patroniName ." -s ". $scope ." --path /tmp/patroni.yml";
+		validate([
+			'patroniIpAdress' => 'required|string',
+			'etcdIpAdress' => 'required|string',
+			'patroniName' => 'required|string',
+			'patroniPassword' => 'required|string'
+
+		]);
+
+		$patroniIp = request("patroniIpAdress");
+        $etcd = request("etcdIpAdress");
+        $patroniName = request("patroniName");
+        $password = request("patroniPassword");
+        $scope = request("scopeName");
+
+		$init = "/etc/gopatroniyml reinit --etcd ". $etcd ." -i " . $patroniIp ." -n ". $patroniName ." --password ". $password ." --path /tmp/patroni.yml";
+		$initScope = "/etc/gopatroniyml reinit --etcd ". $etcd ." -i ". $patroniIp ." -n ". $patroniName ." --password ". $password." -s ". $scope ." --path /tmp/patroni.yml";
 		
 		if($scope != ""){
-			shell_exec($initScope." 2>&1 /tmp/errorLog");
+			shell_exec($initScope." > /tmp/output.txt");
+			shell_exec("echo ".$initScope." > /tmp/commandLog.txt");
+
 		}else{
-			shell_exec($init." 2>&1 /tmp/errorLog");
+			shell_exec($init." > /tmp/output.txt");
+			shell_exec("echo ".$init." > /tmp/commandLog.txt");
 		}
+
+		$remote_path = '/tmp/patroni.yml';
+		putFile('/tmp/patroni.yml', $remote_path);
+		runCommand(sudo().'mv /tmp/patroni.yml /etc/');
         $this->restart();
         return respond("Successfully reinitalized.",200);
+	}
+
+	function info(){
+		$output = runCommand(sudo() . "patronictl -c /etc/patroni.yml list");
+		return respond($output,200);
+
 	}
 
 	function restart(){
@@ -56,8 +93,13 @@ class PatroniController
 		]);
 
 		$ip = request('ip');
-		$add = "/tmp/gopatroniyml --p " . $ip;
-		runCommand(sudo() . $add);
+		$add = "/etc/gopatroniyml --appPatNode " . $ip. " --path /tmp/patroni.yml";
+		shell_exec($add);
+		
+		$remote_path = '/tmp/patroni.yml';
+		putFile('/tmp/patroni.yml', $remote_path);
+		runCommand(sudo().'mv /tmp/patroni.yml /etc/');
+        $this->restart();
 
 		return respond("New node successfully added.",200);
 	}
