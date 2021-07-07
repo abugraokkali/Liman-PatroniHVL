@@ -23,6 +23,11 @@
         <i class="fas fa-sitemap mr-2"></i>
         Nodes</a>
     </li>
+    <li class="nav-item" >
+        <a class="nav-link" onclick="clusterInfo()" href="#nodesOfCluster" data-toggle="tab">
+        <i class="fas fa-sitemap mr-2"></i>
+        Nodes Of Cluster</a>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -32,6 +37,9 @@
     </div>
     <div id="addCluster" class="tab-pane">
         @include('pages.nodes')
+    </div>
+    <div id="nodesOfCluster" class="tab-pane">
+        @include('pages.nodesOfCluster')
     </div>
 </div>
 
