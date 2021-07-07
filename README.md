@@ -5,5 +5,5 @@
 - Add new node
 - Show nodes of cluster and details of them
 
-Ali Buğra Okkalı  
-HAVELSAN - 2021
+*Ali Buğra Okkalı  
+HAVELSAN - 2021*
