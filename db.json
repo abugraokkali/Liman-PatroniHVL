@@ -2,7 +2,7 @@
     "name": "PatroniHVL",
     "publisher": "Administrator",
     "version": "0.0.1",
-    "version_code": 2,
+    "version_code": 3,
     "database": [
         {
             "variable": "etcdAdress",

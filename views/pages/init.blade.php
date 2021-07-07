@@ -56,7 +56,7 @@
                     '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>' +
                     '<i class="fas fa-icon mr-2"></i>' +
                     '<div>'+
-                        '{{__("Sunucuda patroni.yml dosyası tespit edildi ! Reinitialize etmek isterseniz butonu kullanabilirsiniz.")}}'+
+                        '{{__("patroni.yml file detected on the server ! If you want to reinitialize, you can use the button.")}}'+
                     '</div>'+
                 '</div>');
             
@@ -72,7 +72,7 @@
                         '<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Info:"><use xlink:href="#exclamation-triangle-fill"/></svg>' +
                         '<i class="fas fa-icon mr-2"></i>' +
                         '<div>'+
-                            '{{__("Sunucuda patroni.yml dosyası tespit edilemedi ! Initialize etmeniz gerekiyor.")}}'+
+                            '{{__("Could not detect patroni.yml file on the server ! You need to initialize it.")}}'+
                         '</div>'+
                     '</div>');
             document.getElementById("addCluster_li").style.display = "none";

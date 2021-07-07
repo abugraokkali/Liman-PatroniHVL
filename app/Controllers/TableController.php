@@ -5,8 +5,8 @@ use Liman\Toolkit\Shell\Command;
 class TableController
 {
     function hbaTable(){
-        $hbaComm = "/tmp/gopatroniyml -gp";
-        $hbaList = runCommand(sudo() . $hbaComm);
+        $hbaComm = "/etc/gopatroniyml --gp --path /tmp/patroni.yml";
+        $hbaList = shell_exec($hbaComm);
         $hbaList = explode("\n",$hbaList);
         $tmpList = array( );
 
