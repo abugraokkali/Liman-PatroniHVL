@@ -1,7 +1,7 @@
 {
-    "Merhaba Dünya!": "Merhaba Dünya!",
-    "Yükleniyor...": "Yükleniyor...",
-    "Hostname değiştirildi.": "Hostname değiştirildi.",
-    "Hostname değiştirilirken bir hata oluştu!": "Hostname değiştirilirken bir hata oluştu!",
-    "Hostname Değiştir": "Hostname Değiştir"
+   
+    "patroni.yml file detected on the server ! If you want to reinitialize, you can use the button.": "Sunucuda patroni.yml dosyası tespit edildi ! Reinitialize etmek isterseniz butonu kullanabilirsiniz.", 
+    "Could not detect patroni.yml file on the server ! You need to initialize it.": "Sunucuda patroni.yml dosyası tespit edilemedi ! Initialize etmeniz gerekiyor.",
+    "Loading...": "Yükleniyor..."
+
 }
